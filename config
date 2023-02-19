@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export PACKAGE_CORE_NAME="cpolar"
+export PACKAGE_CORE_BIN_NAME="$PACKAGE_CORE_NAME"
+export PACKAGE_CORE_VERSION=v3.3.12
+export PACKAGE_CORE_ORG="cpolar"
+
+export PACKAGE_CORE_RELEASE_DOWNLOAD="https://static.cpolar.com/downloads/releases"

@@ -1,0 +1,88 @@
+#!/bin/bash
+
+install() {
+  # prepare vars
+  local name="$PACKAGE_CORE_NAME"
+
+  log::info "[$(timestamp)][package][$name] preparing ..."
+
+  # get system os/arch
+  local os="$PACKAGE_OS"
+  local arch="$PACKAGE_OS_ARCH"
+  local kernel="$PACKAGE_OS_KERNEL"
+  local platform="$PACKAGE_OS_PLATFORM"
+  # usr_bin_dir
+  local usr_bin_dir="$PACKAGE_USER_BIN_DIR"
+  local tmp_dir="$PACKAGE_TMP_DIR"
+
+  # #
+  # case $platform in
+  # darwin)
+  #   platform="osx"
+  #   ;;
+  # linux) ;;
+
+  # *)
+  #   log::error "[$(timestamp)] unsupport platform: $platform"
+  #   return 1
+  #   ;;
+  # esac
+
+  case $arch in
+  amd64)
+    ;;
+  *)
+    log::error "[$(timestamp)] unsupport arch: $arch"
+    return 1
+    ;;
+  esac
+  #
+
+  # # get latest version
+  # log::info "[$(timestamp)][package][$name] checking latest version ..."
+  # local latest_version=$(git::get_remote_latest_tag $PACKAGE_CORE_GIT_REPOSITORY)
+  # if [ "$?" != "0" ]; then
+  #   log::error "[$(timestamp)][package][$name] failed to get latest version ."
+  #   return 1
+  # fi
+  # PACKAGE_CORE_VERSION=$latest_version
+  # log::success "[$(timestamp)][package][$name] latest version: $PACKAGE_CORE_VERSION"
+
+  # files
+  local tmp_file="$name.zip"
+  local source_bin_file="./$name"
+  # local target_bin_file="$usr_bin_dir/$name"
+
+  # prepare context
+  cd $tmp_dir
+
+  # reference: https://www.cpolar.com/download
+  # example:
+  #   https://static.cpolar.com/downloads/releases/3.3.12/cpolar-stable-darwin-amd64.zip
+  #   https://static.cpolar.com/downloads/releases/3.3.12/cpolar-stable-linux-amd64.zip
+  # generate url
+  local url="${PACKAGE_CORE_RELEASE_DOWNLOAD}/${PACKAGE_CORE_VERSION#v}/${name}-stable-${platform}-${arch}.zip"
+  log::debug "[$(timestamp)][package][$name][$kernel][$arch] url: $url, file: ${tmp_file}, tmp_dir: $tmp_dir"
+
+  # download
+  log::info "[$(timestamp)][package][$name] downloading ..."
+  os::download $tmp_file $url
+  if [ "$?" != "0" ]; then
+    log::error "[$(timestamp)][package][$name] failed to download from $url ."
+    return 1
+  fi
+
+  # extract
+  log::info "[$(timestamp)][package][$name] extracting ..."
+  os::extract $tmp_file
+
+  # install
+  log::info "[$(timestamp)][package][$name] installing ..."
+  os::install $source_bin_file $usr_bin_dir $name
+
+  # clean
+  log::info "[$(timestamp)][package][$name] cleaning ..."
+  rm -rf $tmp_dir
+}
+
+export -f install
