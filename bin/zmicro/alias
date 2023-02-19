@@ -13,7 +13,7 @@ help() {
 }
 
 version() {
-  cpolar --version
+  echo "$PACKAGE_CORE_VERSION"
 }
 
 core() {
